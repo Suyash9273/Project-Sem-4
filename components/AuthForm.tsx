@@ -20,10 +20,12 @@ import { toast } from "sonner" // <--- NEW IMPORT
 export function AuthForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  
+
   // Form States
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [username, setUsername] = useState('')
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,20 +39,24 @@ export function AuthForm() {
     setLoading(true)
 
     // 1. FRONTEND CHECK
-    if (!email.endsWith(COLLEGE_DOMAIN)) {
-      toast.error("Restricted Access", {
-        description: `Only emails ending in ${COLLEGE_DOMAIN} are allowed.`,
-      })
-      setLoading(false)
-      return
-    }
+    // if (!email.endsWith(COLLEGE_DOMAIN)) {
+    //   toast.error("Restricted Access", {
+    //     description: `Only emails ending in ${COLLEGE_DOMAIN} are allowed.`,
+    //   })
+    //   setLoading(false)
+    //   return
+    // }
 
     // 2. BACKEND CALL
-    const { error: supabaseError } = await supabase.auth.signUp({
+    const { data, error: supabaseError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          full_name: fullName,
+          username: username
+        }
       },
     })
 
@@ -84,7 +90,7 @@ export function AuthForm() {
       toast.success("Welcome back!", {
         description: "Redirecting to dashboard...",
       })
-      router.push('/dashboard')
+      router.push('/protected/dashboard')
     }
     setLoading(false)
   }
@@ -108,9 +114,9 @@ export function AuthForm() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email-login">College Email</Label>
-                  <Input 
-                    id="email-login" 
-                    type="email" 
+                  <Input
+                    id="email-login"
+                    type="email"
                     placeholder="rollnumber@nitdelhi.ac.in"
                     className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
                     onChange={(e) => setEmail(e.target.value)}
@@ -119,9 +125,9 @@ export function AuthForm() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-login">Password</Label>
-                  <Input 
-                    id="password-login" 
-                    type="password" 
+                  <Input
+                    id="password-login"
+                    type="password"
                     className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -149,10 +155,37 @@ export function AuthForm() {
             <form onSubmit={handleSignUp}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="e.g. Suyash Kumar"
+                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                {/* NEW FIELD: Username */}
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="e.g. suyash_dev"
+                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())} // Good practice to force lowercase
+                    pattern="^[a-zA-Z0-9_]+$" // Enforces the rule on the frontend too
+                    title="Only letters, numbers, and underscores allowed."
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="email-signup">College Email</Label>
-                  <Input 
-                    id="email-signup" 
-                    type="email" 
+                  <Input
+                    id="email-signup"
+                    type="email"
                     placeholder="rollnumber@nitdelhi.ac.in"
                     className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
                     onChange={(e) => setEmail(e.target.value)}
@@ -162,9 +195,9 @@ export function AuthForm() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password-signup">Create Password</Label>
-                  <Input 
-                    id="password-signup" 
-                    type="password" 
+                  <Input
+                    id="password-signup"
+                    type="password"
                     className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
                     onChange={(e) => setPassword(e.target.value)}
                     required
