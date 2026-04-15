@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -15,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { toast } from "sonner" // <--- NEW IMPORT
+import { toast } from "sonner"
 
 export function AuthForm() {
   const router = useRouter()
@@ -38,7 +39,7 @@ export function AuthForm() {
     e.preventDefault()
     setLoading(true)
 
-    // 1. FRONTEND CHECK
+    // Optional frontend check
     // if (!email.endsWith(COLLEGE_DOMAIN)) {
     //   toast.error("Restricted Access", {
     //     description: `Only emails ending in ${COLLEGE_DOMAIN} are allowed.`,
@@ -47,8 +48,7 @@ export function AuthForm() {
     //   return
     // }
 
-    // 2. BACKEND CALL
-    const { data, error: supabaseError } = await supabase.auth.signUp({
+    const { error: supabaseError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -70,6 +70,7 @@ export function AuthForm() {
         duration: 5000,
       })
     }
+
     setLoading(false)
   }
 
@@ -92,127 +93,173 @@ export function AuthForm() {
       })
       router.push('/protected/dashboard')
     }
+
     setLoading(false)
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto relative z-10">
       <Tabs defaultValue="login" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-zinc-900/50">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Sign Up</TabsTrigger>
+
+        {/* Tabs */}
+        <TabsList className="grid w-full grid-cols-2 bg-black p-1 rounded-none h-12">
+          <TabsTrigger
+            value="login"
+            className="rounded-none font-black uppercase tracking-widest data-[state=active]:bg-[#22d3ee] data-[state=active]:text-black text-white transition-all"
+          >
+            Entry
+          </TabsTrigger>
+          <TabsTrigger
+            value="signup"
+            className="rounded-none font-black uppercase tracking-widest data-[state=active]:bg-[#facc15] data-[state=active]:text-black text-white transition-all"
+          >
+            Register
+          </TabsTrigger>
         </TabsList>
 
-        {/* --- LOGIN TAB --- */}
-        <TabsContent value="login">
-          <Card className="border-violet-900/50 bg-zinc-950/80 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Welcome Back</CardTitle>
-              <CardDescription>Enter your college credentials to access the portal.</CardDescription>
+        {/* LOGIN */}
+        <TabsContent value="login" className="mt-0">
+          <Card className="border-[3px] border-t-0 border-black bg-white dark:bg-zinc-900 rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="space-y-1 bg-zinc-50 dark:bg-zinc-800 border-b-2 border-black">
+              <CardTitle className="text-xl font-black uppercase tracking-tighter">
+                Welcome Back
+              </CardTitle>
+              <CardDescription className="text-[10px] font-bold uppercase text-black/60 dark:text-white/50">
+                Authorized Personnel Only
+              </CardDescription>
             </CardHeader>
+
             <form onSubmit={handleSignIn}>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5 pt-6">
+
                 <div className="space-y-2">
-                  <Label htmlFor="email-login">College Email</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    College Email
+                  </Label>
                   <Input
-                    id="email-login"
                     type="email"
-                    placeholder="rollnumber@nitdelhi.ac.in"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    placeholder="ROLLNUMBER@NITDELHI.AC.IN"
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#22d3ee]"
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="password-login">Password</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    Access Key
+                  </Label>
                   <Input
-                    id="password-login"
                     type="password"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#22d3ee]"
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
+
               </CardContent>
-              <CardFooter className='mt-6'>
-                <Button disabled={loading} type="submit" className="w-full bg-violet-600 hover:bg-violet-700">
-                  {loading ? "Signing In..." : "Sign In"}
+
+              <CardFooter className="pb-6">
+                <Button
+                  disabled={loading}
+                  type="submit"
+                  className="w-full bg-[#22c55e] hover:bg-[#16a34a] text-black font-black uppercase tracking-widest rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  {loading ? "INITIALIZING..." : "START SESSION"}
                 </Button>
               </CardFooter>
             </form>
           </Card>
         </TabsContent>
 
-        {/* --- SIGN UP TAB --- */}
-        <TabsContent value="signup">
-          <Card className="border-violet-900/50 bg-zinc-950/80 backdrop-blur">
-            <CardHeader>
-              <CardTitle>Create Account</CardTitle>
-              <CardDescription>
-                Join the NIT Delhi portal. Official email required.
+        {/* SIGNUP */}
+        <TabsContent value="signup" className="mt-0">
+          <Card className="border-[3px] border-t-0 border-black bg-white dark:bg-zinc-900 rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <CardHeader className="space-y-1 bg-zinc-50 dark:bg-zinc-800 border-b-2 border-black">
+              <CardTitle className="text-xl font-black uppercase tracking-tighter">
+                New Registration
+              </CardTitle>
+              <CardDescription className="text-[10px] font-bold uppercase text-black/60 dark:text-white/50">
+                Official NIT Delhi domain required
               </CardDescription>
             </CardHeader>
+
             <form onSubmit={handleSignUp}>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-5 pt-6">
+
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    Full Name
+                  </Label>
                   <Input
-                    id="fullName"
                     type="text"
                     placeholder="e.g. Suyash Kumar"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#facc15]"
                     onChange={(e) => setFullName(e.target.value)}
                     required
                   />
                 </div>
 
-                {/* NEW FIELD: Username */}
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    Username
+                  </Label>
                   <Input
-                    id="username"
                     type="text"
                     placeholder="e.g. suyash_dev"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
-                    onChange={(e) => setUsername(e.target.value.toLowerCase())} // Good practice to force lowercase
-                    pattern="^[a-zA-Z0-9_]+$" // Enforces the rule on the frontend too
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#facc15]"
+                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                    pattern="^[a-zA-Z0-9_]+$"
                     title="Only letters, numbers, and underscores allowed."
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email-signup">College Email</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    College Email
+                  </Label>
                   <Input
-                    id="email-signup"
                     type="email"
-                    placeholder="rollnumber@nitdelhi.ac.in"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    placeholder="ROLLNUMBER@NITDELHI.AC.IN"
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#facc15]"
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <p className="text-xs text-zinc-500">Must be an @nitdelhi.ac.in address.</p>
+                  <p className="text-[9px] font-black uppercase text-red-600 bg-red-50 p-1 border border-red-100">
+                    * Restricted to @nitdelhi.ac.in
+                  </p>
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="password-signup">Create Password</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest">
+                    Set Access Key
+                  </Label>
                   <Input
-                    id="password-signup"
                     type="password"
-                    className="bg-zinc-900 border-zinc-800 focus:border-violet-500"
+                    className="rounded-none border-2 border-black bg-white dark:bg-zinc-950 focus-visible:border-[#facc15]"
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
                 </div>
+
               </CardContent>
-              <CardFooter className='mt-6'>
-                <Button disabled={loading} type="submit" className="w-full bg-violet-600 hover:bg-violet-700">
-                  {loading ? "Creating Account..." : "Create Account"}
+
+              <CardFooter className="pb-6">
+                <Button
+                  disabled={loading}
+                  type="submit"
+                  className="w-full bg-[#facc15] hover:bg-[#eab308] text-black font-black uppercase tracking-widest rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  {loading ? "PROCESSING..." : "REGISTER ACCOUNT"}
                 </Button>
               </CardFooter>
             </form>
           </Card>
         </TabsContent>
+
       </Tabs>
     </div>
   )
 }
+
