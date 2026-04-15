@@ -14,6 +14,8 @@ import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useUserStore } from '@/store/useUserStore'
+import DeletePostButton from '@/components/DeletePostButton'
+import {Sidebar, SidebarBody, SidebarLink} from '@/components/ui/sidebar'
 
 // Define the shape of our Item
 type Item = {
@@ -29,8 +31,9 @@ type Item = {
 export default function FeedPage() {
   const [items, setItems] = useState<Item[]>([])
   const [search, setSearch] = useState('')
-  const [startingChatId, setStartingChatId] = useState<string | null>(null) // this tracks which "contact owner" button is clicked
+  const [startingChatId, setStartingChatId] = useState<string | null>(null)
   const router = useRouter()
+  
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -57,12 +60,16 @@ export default function FeedPage() {
         // Prepend new item to the list instantly
         setItems((current) => [payload.new as Item, ...current])
       })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'items' }, (payload) => {
+        // Remove item from the list instantly when deleted
+        setItems((current) => current.filter(item => item.id !== payload.old.id))
+      })
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [supabase])
 
   //Function to handle contact-owner/contact finder(to initialize/continue the chat)
   const handleStartChat = async (ownerId: string) => {
@@ -83,7 +90,7 @@ export default function FeedPage() {
     router.push(`/protected/chat/${conversationId}`)
   }
 
-  // Filter items based on Search + Tab is handled by TabsContent logic below for simplicity or we can filter arrays
+  // Filter items based on Search + Tab is handled by TabsContent logic below for simplicity
   const filteredItems = items.filter(item =>
     item.title.toLowerCase().includes(search.toLowerCase()) ||
     item.description?.toLowerCase().includes(search.toLowerCase())
@@ -160,22 +167,27 @@ export default function FeedPage() {
                       </CardContent>
 
                       <CardFooter>
-                        {/* Link to Chat Page with the Item Owner */}
                         {
                           currentUser?.id === item.user_id ? (
-                            <div>
-                              <Button disabled variant="secondary" className="w-full bg-zinc-800 text-zinc-500 border-none">
-                                <UserIcon className="mr-2 h-4 w-4" />
-                                This is your post
-                              </Button>
+                            // --- UPDATED: Delete Button Layout ---
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-xs font-medium text-zinc-500 bg-zinc-900/80 px-3 py-1.5 rounded-md flex items-center">
+                                <UserIcon className="mr-2 h-3 w-3" />
+                                Your Post
+                              </span>
+                              <DeletePostButton 
+                                itemId={item.id} 
+                                imageUrl={item.image_url} 
+                              />
                             </div>
                           ) : (
-                            <div>
+                            // --- Original Contact Logic ---
+                            <div className="w-full">
                               <Button
-                              variant={`outline`}
-                              className='w-full border-zinc-700 hover:bg-zinc-800 hover:text-white'
-                              onClick={() => handleStartChat(item.user_id)}
-                              disabled={startingChatId === item.user_id}
+                                variant="outline"
+                                className='w-full border-zinc-700 hover:bg-zinc-800 hover:text-white'
+                                onClick={() => handleStartChat(item.user_id)}
+                                disabled={startingChatId === item.user_id}
                               >
                                 {
                                   startingChatId === item.user_id ? (

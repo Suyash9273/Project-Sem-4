@@ -33,27 +33,33 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // 1. Get the user from Supabase
+  // 1. Get the user from Supabase securely
   const { data: { user } } = await supabase.auth.getUser()
+  const path = request.nextUrl.pathname
 
-  // 2. Define Protected Routes
-  // Add any path here that requires login
-  if (request.nextUrl.pathname.startsWith('/api') || request.nextUrl.pathname.startsWith('/protected')) {
-    
-    // If no user, redirect to login
+  // 2. Define Protected Routes for CampusConnect
+  // Add all the routes that require a user to be logged in
+  const isProtectedRoute = path.startsWith('/protected/feed') || 
+                           path.startsWith('/protected/chat') || 
+                           path.startsWith('/protected/inbox') || 
+                           path.startsWith('/protected/report') ||
+                           path.startsWith('/protected/protected')
+
+  if (isProtectedRoute) {
+    // If no user is found, redirect them to the root login page
     if (!user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = '/' 
       return NextResponse.redirect(url)
     }
   }
 
   // 3. Define Auth Routes (Login/Signup)
-  // If user is ALREADY logged in, they shouldn't see the login page
-  if (request.nextUrl.pathname.startsWith('/login')) {
+  // If user is ALREADY logged in and tries to go to the login page (root '/' or '/login')
+  if (path === '/' || path.startsWith('/login')) {
     if (user) {
       const url = request.nextUrl.clone()
-      url.pathname = '/api/dashboard' // Redirect to home/dashboard
+      url.pathname = '/protected/feed' // Kick them straight to the main feed
       return NextResponse.redirect(url)
     }
   }

@@ -12,7 +12,7 @@ const page = () => {
     {
       id: 1,
       name: "Prashant",
-      desc: "Neta Banne Ka Shokh Hai...",
+      desc: "Neta Banne Ka Socha Hai...",
       imgName: "Zoro"
     },
     {
@@ -33,17 +33,20 @@ const page = () => {
     {
       id: 1,
       title: "Buy And Sell",
-      desc: "Students can buy and sell items with other students on our platform"
+      desc: "Students can buy and sell items with other students on our platform",
+      link: "#"
     },
     {
       id: 2,
       title: "Lost And Found",
-      desc: "Students can use our application for helping others find their lost items"
+      desc: "Students can use our application for helping others find their lost items",
+      link: "http://localhost:3000/protected/feed"
     },
     {
       id: 3,
       title: "Mess-Co",
-      desc: "Students can coordinate with Mess Authority with our application."
+      desc: "Students can coordinate with Mess Authority with our application.",
+      link: "#"
     }
   ]
 
@@ -67,7 +70,7 @@ const page = () => {
         <div className='grid grid-cols-3 justify-items-start'>
           {
             services.map((service) => (
-              <ServiceCard key={service.id} title={service.title} desc={service.desc} />
+              <ServiceCard key={service.id} title={service.title} desc={service.desc} link={service.link} />
             ))
           }
         </div>
