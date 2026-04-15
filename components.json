@@ -18,5 +18,9 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@animate-ui": "https://animate-ui.com/r/{name}.json",
+    "@smoothui": "https://smoothui.dev/r/{name}.json",
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json"
+  }
 }
